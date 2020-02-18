@@ -13,6 +13,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -62,10 +63,20 @@ func NewUploadFileOptions() UploadFileOptions {
 func NewS3Client(
 	progressOutput io.Writer,
 	awsConfig *aws.Config,
+	role string,
 	useV2Signing bool,
 ) S3Client {
-	sess := session.New(awsConfig)
-	client := s3.New(sess, awsConfig)
+	var sess *session.Session
+	var client *s3.S3
+	if role == "" {
+		sess := session.New(awsConfig)
+		client = s3.New(sess, awsConfig)
+	} else {
+		sess := session.Must(session.NewSession())
+		creds := stscreds.NewCredentials(sess, role)
+		awsConfig.Credentials = creds
+		client = s3.New(sess, awsConfig)
+	}
 
 	if useV2Signing {
 		setv2Handlers(client)
