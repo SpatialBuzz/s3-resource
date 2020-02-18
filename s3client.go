@@ -104,6 +104,8 @@ func NewAwsConfig(
 	if accessKey == "" && secretKey == "" {
 		creds = credentials.AnonymousCredentials
 	} else {
+		os.Setenv("AWS_ACCESS_KEY_ID", accessKey)
+		os.Setenv("AWS_SECRET_ACCESS_KEY", secretKey)
 		creds = credentials.NewStaticCredentials(accessKey, secretKey, sessionToken)
 	}
 
@@ -180,10 +182,10 @@ func (client *s3client) BucketFileVersions(bucketName string, remotePath string)
 func (client *s3client) UploadFile(bucketName string, remotePath string, localPath string, options UploadFileOptions) (string, error) {
 	uploader := s3manager.NewUploaderWithClient(client.client)
 
-	if client.isGCSHost() {
-		// GCS returns `InvalidArgument` on multipart uploads
-		uploader.MaxUploadParts = 1
-	}
+	// if client.isGCSHost() {
+	// 	// GCS returns `InvalidArgument` on multipart uploads
+	// 	uploader.MaxUploadParts = 1
+	// }
 
 	stat, err := os.Stat(localPath)
 	if err != nil {

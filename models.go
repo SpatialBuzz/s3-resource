@@ -3,7 +3,7 @@ package s3resource
 type Source struct {
 	AccessKeyID          string `json:"access_key_id"`
 	SecretAccessKey      string `json:"secret_access_key"`
-	Role                 string `json:"aws_role"`
+	Role                 string `json:"role"`
 	SessionToken         string `json:"session_token"`
 	Bucket               string `json:"bucket"`
 	Regexp               string `json:"regexp"`
